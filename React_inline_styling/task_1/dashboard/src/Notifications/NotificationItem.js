@@ -1,26 +1,43 @@
-import React, { memo } from 'react';
-import './Notifications.css';
+import React, { PureComponent, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { StyleSheet, css } from 'aphrodite';
 
-// functional component ES6 shortcut
-const NotificationItem = ({ type, html, value, markAsRead }) => {
-    // JSX goes here
-    return (
-        <li
-            data-notification-type={ type } dangerouslySetInnerHTML={ html }
-            onClick={markAsRead}
-        >{ value }</li>
-    );
+export default class NotificationItem extends PureComponent {
+	render() {
+		let {id,type,value,html,markAsRead} = this.props;
+		let liStyle = (type === 'urgent') ? styles.urgentNotif : styles.defaultNotif;
+
+		return (
+			<Fragment>
+				{html !== undefined &&<li className={css(liStyle)} onClick={() => markAsRead(id)}
+						data-priority-type={type}
+						dangerouslySetInnerHTML={html}/>}
+				{html === undefined && <li className={css(liStyle)} onClick={() => markAsRead(id)}
+				data-priority-type={type}>{value}</li>}
+			</Fragment>
+		);
+	};
 };
+const styles = StyleSheet.create({
+	defaultNotif: {
+		color: 'blue',
+	},
+	urgentNotif: {
+		color: 'red',
+	},
+});
+
 
 NotificationItem.propTypes = {
-    html: PropTypes.shape({ __html: PropTypes.string }),
-    value: PropTypes.string,
-    type: PropTypes.string.isRequired
+	html: PropTypes.shape({
+		__html: PropTypes.string,
+	}),
+	type: PropTypes.string.isRequired,
+	value: PropTypes.string,
+	markAsRead: PropTypes.func,
 };
 
 NotificationItem.defaultProps = {
-    type: 'default',
-}
+	type: "default",
+};
 
-export default memo(NotificationItem);

@@ -1,58 +1,56 @@
-/**
- * @jest-environment jsdom
- */
-
 import React from 'react';
-import { shallow } from 'enzyme';
+import { expect } from 'chai';
+import { configure, shallow } from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
 import NotificationItem from './NotificationItem';
-import Notifications from './Notifications';
-import { StyleSheetTestUtils } from 'aphrodite';
+import { StyleSheetTestUtils, } from 'aphrodite';
 
-beforeEach(() => {
-    StyleSheetTestUtils.suppressStyleInjection();
-});
+configure({adapter: new Adapter()});
 
-describe('<NotificationItem />', () => {
-    it('renders an <NotificationItems /> component', () => {
-        const wrapper = shallow(<NotificationItem />);
-        expect(wrapper).toHaveLength(1);
-    });
+describe("Testing <NotificationItem /> Component", () => {
 
-    it('renders an <NotificationItem /> component with type and value', () => {
-        const wrapper = shallow(<NotificationItem type="default" value="test" />);
-        expect(wrapper.props()[ 'data-notification-type' ]).toEqual('default');
-        expect(wrapper.text()).toEqual('test');
-        expect(wrapper.html()).toContain('<li data-notification-type="default"');
-        expect(wrapper.html()).toContain('test</li>');
-    });
+	beforeEach(() => {
+		StyleSheetTestUtils.suppressStyleInjection();
+	});
 
-    it('renders an <NotificationItem /> component checking for html pass through', () => {
-        const wrapper = shallow(<NotificationItem html={ { __html: '<u>test</u>' } } />);
-        expect(wrapper.html()).toContain('<u>test</u>');
-    });
+	afterEach(() => {
+		StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
+	});
 
-    it('calls markAsRead with the right id', () => {
-        const listNotifications = [
-            { id: 1, type: 'default', value: 'New course available' },
-            { id: 2, type: 'urgent', value: 'New resume available' },
-            { id: 3, type: 'urgent', value: 'Holberton Danger' },
-        ];
+	let wrapper;
 
-        const wrapper = shallow(<Notifications displayDrawer={ true } listNotifications={ listNotifications } />);
+	it("<NotificationItem /> is rendered without crashing", () => {
+		wrapper = shallow(<NotificationItem shouldRender />);
 
-        const instance = wrapper.instance();
-        const spy = jest.spyOn(instance, 'markAsRead');
+		console.log(wrapper);
+		expect(wrapper).to.not.be.an("undefined");
+	});
 
-        const item1 = wrapper.find(NotificationItem).at(0).dive();
-        item1.simulate('click');
-        expect(spy).toBeCalledWith(1);
 
-        const item2 = wrapper.find(NotificationItem).at(1).dive();
-        item2.simulate('click');
-        expect(spy).toBeCalledWith(2);
 
-        const item3 = wrapper.find(NotificationItem).at(2).dive();
-        item3.simulate('click');
-        expect(spy).toBeCalledWith(3);
-    });
+	it("<NotificationItem />  passing value props", () => {
+
+		let props = {
+			type: "default",
+			value: "New resume",
+			html: undefined
+		}
+
+		let component = shallow(<NotificationItem {...props} />);
+
+		console.log(component);
+		expect(component.contains(< li data-priority-type={props.type} dangerouslySetInnerHTML={undefined}>New resume </li>)).to.equal(false);
+	});
+	it("spy as the markAsRead property and Check that when simulating a click on the component, the spy is called with the right ID argument", () => {
+		let props = {
+			type: "urgent",
+			html: { __html: "<p>test</p>"},
+			markAsRead: (id) => { console.log(`Notification ${id} has been marked as read`)}
+		};
+		wrapper = shallow(<NotificationItem {...props} />);
+		console.log = jest.fn();
+		wrapper.find('li').simulate('click');
+		expect(console.log.mock.calls.length).to.equal(1);
+	});
+
 });

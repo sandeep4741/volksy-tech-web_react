@@ -1,38 +1,50 @@
-/**
- * @jest-environment jsdom
- */
-import React, { Component } from 'react';
-import { mount } from 'enzyme';
-import Login from '../Login/Login';
-import WithLogging from './WithLogging';
-import { StyleSheetTestUtils } from 'aphrodite';
+import React from 'react';
+import chai, { expect } from 'chai';
+import Adapter from 'enzyme-adapter-react-16';
+import { configure, mount } from 'enzyme';
+import WithLogging from './WithLogging.js';
+import sinonChai from 'sinon-chai';
+import { spy } from 'sinon';
+import Login from '../Login/Login.js';
+import { StyleSheetTestUtils } from "aphrodite";
 
-beforeEach(() => {
-    StyleSheetTestUtils.suppressStyleInjection();
+chai.use(sinonChai);
+let logs = spy(console, 'log');
+
+configure({
+	adapter: new Adapter()
 });
 
-describe('<WithLogging /> HOC', () => {
-    it('verifies console.log output when mounting and umounting pure HTML', () => {
-        const spy = jest.spyOn(console, 'log');
-        const Component = WithLogging(() => <p />);
 
-        const wrapper = mount(<Component />);
+describe("Test WithLogging.js", () => {
+	beforeEach(() => {
+		StyleSheetTestUtils.suppressStyleInjection();
+	});
 
-        expect(spy).toHaveBeenCalledWith('Component Component is mounted');
-        wrapper.unmount();
-        expect(spy).toHaveBeenCalledWith('Component Component is going to unmount');
-        spy.mockRestore();
-    });
+	afterEach(() => {
+		StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
+	});
 
-    it('verifies console.log output when mounting and umounting Login component', () => {
-        const spy = jest.spyOn(console, 'log');
-        const Component = WithLogging(Login);
+	it("console.log was called on mount and on unmount with Component pure html", () => {
+		let wrapper = mount(
+			<WithLogging>
+				<p>simple phrase</p>
+			</WithLogging>
+		);
+		expect(logs).to.have.been.calledWith('Component Component is mounted');
+		wrapper.unmount();
+		expect(logs).to.have.been.calledWith('Component Component is going to unmount');
+	});
 
-        const wrapper = mount(<Component />);
+	it("Renders the correct children with <Login /> ", () => {
+		let wrapper = mount(
+			<WithLogging>
+				<Login />
+			</WithLogging>
+      );
+		expect(logs).to.have.been.calledWith('Component Login is mounted');
+		wrapper.unmount();
+		expect(logs).to.have.been.calledWith('Component Login is going to unmount');
+	});
 
-        expect(spy).toHaveBeenCalledWith('Component Login is mounted');
-        wrapper.unmount();
-        expect(spy).toHaveBeenCalledWith('Component Login is going to unmount');
-        spy.mockRestore();
-    });
 });
