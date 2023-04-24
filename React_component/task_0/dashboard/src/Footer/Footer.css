@@ -1,10 +1,8 @@
-/* App-footer */
-
-.App-footer {
+.footer {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  text-align: center;
   font-style: italic;
-  border-top: 4px solid var(--holb-red);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 5vmin;
+  border-top: thick solid #e0344a;
 }

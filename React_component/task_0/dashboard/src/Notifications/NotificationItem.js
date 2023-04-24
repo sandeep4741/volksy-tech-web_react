@@ -1,12 +1,30 @@
 import React from 'react';
-import './Notifications.css';
+import PropTypes from 'prop-types';
 
-// functional component ES6 shortcut
-const NotificationItem = ({ type, html, value }) => {
-    // JSX goes here
-    return (
-        <li data-notification-type={ type } dangerouslySetInnerHTML={ html }>{ value }</li>
-    );
+function NotificationItem({ type, html, value }) {
+  let li;
+
+  value
+    ? (li = <li data-notification-type={type}>{value}</li>)
+    : (li = (
+        <li data-notification-type={type} dangerouslySetInnerHTML={html}></li>
+      ));
+
+  return li;
+}
+
+NotificationItem.defaultProps = {
+  type: 'default',
+  value: '',
+  html: {},
+};
+
+NotificationItem.propTypes = {
+  type: PropTypes.string,
+  value: PropTypes.string,
+  html: PropTypes.shape({
+    __html: PropTypes.string,
+  }),
 };
 
 export default NotificationItem;

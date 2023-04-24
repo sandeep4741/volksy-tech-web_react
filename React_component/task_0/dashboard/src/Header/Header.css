@@ -1,14 +1,16 @@
-.App-header {
-  background-color: white;
+.header {
   display: flex;
-  flex-direction: row;
+  color: #e0344a;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  border-bottom: 4px solid var(--holb-red);
+  border-bottom: thick solid #e0344a;
+  width: 100%;
+  position: fixed;
 }
 
-.App-header h1 {
-  max-width: fit-content;
-  color: var(--holb-red);
+.header img {
+  width: 144px;
+}
+
+.header h1 {
+  margin: 0;
 }
