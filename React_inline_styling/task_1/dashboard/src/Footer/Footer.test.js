@@ -1,16 +1,20 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import Footer from './Footer';
+import { StyleSheetTestUtils } from 'aphrodite';
+
+beforeEach(() => {
+    StyleSheetTestUtils.suppressStyleInjection();
+});
 
 describe('<Footer />', () => {
-  const wrapper = shallow(<Footer />);
+    it('renders an <Footer /> component', () => {
+        const wrapper = shallow(<Footer />);
+        expect(wrapper).toHaveLength(1);
+    });
 
-  it('render without crashing', () => {
-    expect(wrapper.exists());
-  });
-
-  it('paragraph and content', () => {
-    expect(wrapper.find('footer p')).toHaveLength(1);
-    expect(wrapper.find('footer p').text()).toContain('Copyright');
-  });
+    it('renders an <Footer /> component checking for App-Footer', () => {
+        const wrapper = shallow(<Footer />);
+        expect(wrapper.find('.App-footer p').text()).toContain('Copyright');
+    });
 });

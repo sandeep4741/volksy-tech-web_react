@@ -1,88 +1,101 @@
-import React, { Component, Fragment } from 'react';
+import './App.css';
+import React from 'react';
+import { hot } from 'react-hot-loader';
+import PropTypes from 'prop-types';
+
 import Header from '../Header/Header';
 import Login from '../Login/Login';
 import Footer from '../Footer/Footer';
 import Notifications from '../Notifications/Notifications';
 import CourseList from '../CourseList/CourseList';
-import BodySection from '../BodySection/BodySection';
 import BodySectionWithMarginBottom from '../BodySection/BodySectionWithMarginBottom';
-import PropTypes from 'prop-types';
+import BodySection from '../BodySection/BodySection';
 import { getLatestNotification } from '../utils/utils';
 import { StyleSheet, css } from 'aphrodite';
 
-class App extends Component {
+const styles = StyleSheet.create({
+  /* App-footer */
+
+  AppFooter: {
+    fontStyle: 'italic',
+    borderTop: '4px solid #FF0000',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '5vmin',
+  }
+});
+
+class App extends React.Component {
   constructor(props) {
     super(props);
-    this.handleLogout = this.handleLogout.bind(this);
+    this.handleKeydown = this.handleKeydown.bind(this);
   }
+
+  // Lifecycle Methods
   componentDidMount() {
-    window.addEventListener('keydown', this.handleLogout);
+    window.addEventListener('keydown', this.handleKeydown);
   }
+
   componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleLogout);
+    window.removeEventListener('keydown', this.handleKeydown);
   }
-  handleLogout(e) {
+
+  // Handle Log out
+  handleKeydown(e) {
     if (e.ctrlKey && e.key === 'h') {
-      e.preventDefault();
       alert('Logging you out');
       this.props.logOut();
     }
   }
+
   render() {
+    const { isLoggedIn, logOut } = this.props;
+
     const listCourses = [
       { id: 1, name: 'ES6', credit: 60 },
       { id: 2, name: 'Webpack', credit: 20 },
       { id: 3, name: 'React', credit: 40 },
     ];
+    const htmlObj = getLatestNotification();
     const listNotifications = [
       { id: 1, type: 'default', value: 'New course available' },
-      { id: 2, type: 'urgent', value: 'New resume available' },
-      { id: 3, type: 'urgent', html: { __html: getLatestNotification() } },
-    ];
-    const { isLoggedIn } = this.props;
+      { id: 2, type: 'urgent', value: 'New course available' },
+      { id: 3, type: 'urgent', html: htmlObj },
+    ]
+
     return (
-      <Fragment>
-        <Notifications listNotifications={listNotifications} />
-        <Header />
-        {isLoggedIn ? (
-          <BodySectionWithMarginBottom title='Course list'>
-            <CourseList listCourses={listCourses} />
+      <>
+        <Notifications displayDrawer={ false } listNotifications={ listNotifications } />
+        <div className="App">
+          <Header />
+          { isLoggedIn ?
+          <BodySectionWithMarginBottom title="Course list">
+              <CourseList listCourses={ listCourses } />
           </BodySectionWithMarginBottom>
-        ) : (
-          <BodySectionWithMarginBottom title='Log in to continue'>
+           :
+          <BodySectionWithMarginBottom title="Log in to continue">
             <Login />
           </BodySectionWithMarginBottom>
-        )}
-        <BodySection title='News from the School'>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-        </BodySection>
-        <div className={css(styles.footer)}>
-          <Footer />
+          }
+          <BodySection title="News from the School">
+            <p>Graduation date is January 28th!</p>
+          </BodySection>
+          <Footer className={css(styles.AppFooter)} />
         </div>
-      </Fragment>
-    );
+      </>
+    )
   }
 }
-
-App.defaultProps = {
-  isLoggedIn: false,
-  logOut: () => undefined,
-};
 
 App.propTypes = {
   isLoggedIn: PropTypes.bool,
   logOut: PropTypes.func,
 };
 
-const styles = StyleSheet.create({
-  footer: {
-    width: '100%',
-    position: 'fixed',
-    bottom: 0,
-    textAlign: 'center',
-    fontStyle: 'italic',
-    borderTop: 'thick solid #e0344a',
-  },
-});
+App.defaultProps = {
+  isLoggedIn: false,
+  logOut: () => {},
+};
 
-export default App;
+export default hot(module)(App);
